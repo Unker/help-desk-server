@@ -1,4 +1,3 @@
-const fs = require('fs');
 const http = require('http');
 const Koa = require('koa');
 const koaBody = require('koa-body');
@@ -10,9 +9,31 @@ const cors = require('koa-cors');
 const app = new Koa();
 const router = new Router();
 
-app.use(cors({ origin: '*' })); // Настройка CORS для разрешения всех источников (*)
+// app.use(koaBody({
+//   urlencoded: true,
+//   multipart: true,
+// }));
+
+app.use(cors({ 
+  origin: '*', // Настройка CORS для разрешения всех источников (*)
+  methods: 'DELETE, PUT, PATCH, GET, POST'
+})); 
 
 const tickets = []; // Здесь будем хранить тикеты
+let globId = 0;
+
+function addTicket(name, description='', status=false) {
+  globId += 1;
+  const newTicket = {
+    id: globId,
+    name,
+    description,
+    status,
+    created: new Date().getTime(),
+  };
+  tickets.push(newTicket);
+  return newTicket; // Вернем новый тикет
+};
 
 router.get('/', (ctx) => {
   const { method, id } = ctx.query;
@@ -26,7 +47,7 @@ router.get('/', (ctx) => {
     }));
     ctx.body = allTickets;
   } else if (method === 'ticketById') {
-    const ticket = tickets.find((t) => t.id === id);
+    const ticket = tickets.find((t) => t.id === Number(id));
     if (!ticket) {
       ctx.status = 404;
       ctx.body = 'Ticket not found';
@@ -38,24 +59,37 @@ router.get('/', (ctx) => {
   }
 });
 
-
 // Обработчик для создания нового тикета
-router.post('/createTicket', (ctx) => {
+router.post('/', koaBody({
+  urlencoded: true,
+}), (ctx) => {
   const { method } = ctx.query;
   const { name, status, description } = ctx.request.body;
-  if (method === 'ticketById') {
-    const id = tickets.length + 1; // Простейший способ генерации уникального ID
-    const created = new Date().getTime(); // Текущая дата и время
-  
-    const newTicket = {
-      id,
-      name,
-      status,
-      created,
-    };
-  
-    tickets.push(newTicket);
+  if (method === 'createTicket') {
+    const newTicket = addTicket(name, description, status);
     ctx.body = newTicket;
+    ctx.status = 201;
+  } else {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+  }
+});
+
+// Обработчик для удаления заявки по ID
+router.delete('/', (ctx) => {
+  const { method, id } = ctx.query;
+  const index = tickets.findIndex((ticket) => ticket.id === Number(id));
+
+  if (method === 'deleteTicket') {
+    if (index !== -1) {
+      // Если заявка с указанным ID найдена, удаляем ее из массива
+      const deletedTicket = tickets.splice(index, 1)[0];
+      ctx.status = 200;
+      ctx.body = deletedTicket;
+    } else {
+      ctx.status = 404;
+      ctx.body = 'Ticket not found';
+    }
   } else {
     ctx.status = 404;
   }
@@ -65,22 +99,10 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 // Добавление нескольких тикетов для тестирования
-tickets.push({
-  id: '1',
-  name: 'Заявка 1',
-  status: false,
-  created: new Date().getTime(),
-});
+addTicket(name='Заявка 1', description='Описание 1');
+addTicket(name='Заявка 2', description='Описание 2', status=true);
 
-tickets.push({
-  id: '2',
-  name: 'Заявка 2',
-  status: true,
-  created: new Date().getTime(),
-});
-
-const port = process.env.PORT || 3000;
-console.log('process.env=',process.env)
+const port = process.env.SERVER_PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

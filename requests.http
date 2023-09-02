@@ -1,14 +1,26 @@
 # примеры API-запросов
 
-@port = process.env.PORT
+@port = 3000
 @baseUrl = http://localhost:{{port}}
 
-# получение молекулы
+# получение тикетов
 GET {{baseUrl}}/?method=allTickets
-Content-Type: application/json
 
 ###
 
-# получение свойств и их описания 
-GET {{base}}/descriptors/
+# получение тикета
+GET {{baseUrl}}/?method=ticketById&id=2
+
+###
+
+# получение тикета
+POST {{baseUrl}}/?method=createTicket
 Content-Type: application/json
+
+{
+  "name": "asd",
+  "description": "description123",
+  "status": true
+}
+
+###
