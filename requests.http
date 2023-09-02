@@ -29,3 +29,13 @@ Content-Type: application/json
 DELETE {{baseUrl}}/?method=deleteTicket&id=2
 
 ###
+
+# получение тикета
+PATCH {{baseUrl}}/?method=editTicket&id=1
+Content-Type: application/json
+
+{
+  "status": true
+}
+
+###

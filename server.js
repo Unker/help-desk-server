@@ -95,6 +95,40 @@ router.delete('/', (ctx) => {
   }
 });
 
+// Изменение тикета по ID
+router.patch('/', koaBody({
+  urlencoded: true,
+}), (ctx) => {
+  const { method, id } = ctx.query;
+  const index = tickets.findIndex((ticket) => ticket.id === Number(id));
+
+  if (method === 'editTicket') {
+    if (index !== -1) {
+      // Если тикет с указанным ID найден, то корректируем по новым параметрам
+      const { name, description, status } = ctx.request.body;
+
+      const ticketToUpdate = tickets[index];
+      if (name !== undefined) {
+        ticketToUpdate.name = name;
+      }
+      if (description !== undefined) {
+        ticketToUpdate.description = description;
+      }
+      if (status !== undefined) {
+        ticketToUpdate.status = status;
+      }
+
+      ctx.status = 200;
+      ctx.body = ticketToUpdate;
+    } else {
+      ctx.status = 404;
+      ctx.body = 'Ticket not found';
+    }
+  } else {
+    ctx.status = 404;
+  }
+});
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 
