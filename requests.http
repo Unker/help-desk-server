@@ -1,0 +1,14 @@
+# примеры API-запросов
+
+@port = process.env.PORT
+@baseUrl = http://localhost:{{port}}
+
+# получение молекулы
+GET {{baseUrl}}/?method=allTickets
+Content-Type: application/json
+
+###
+
+# получение свойств и их описания 
+GET {{base}}/descriptors/
+Content-Type: application/json
