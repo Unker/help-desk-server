@@ -24,3 +24,8 @@ Content-Type: application/json
 }
 
 ###
+
+# получение тикета
+DELETE {{baseUrl}}/?method=deleteTicket&id=2
+
+###
