@@ -65,10 +65,16 @@ router.post('/', koaBody({
 }), (ctx) => {
   const { method } = ctx.query;
   const { name, status, description } = ctx.request.body;
+  console.log(ctx.request.body)
   if (method === 'createTicket') {
-    const newTicket = addTicket(name, description, status);
-    ctx.body = newTicket;
-    ctx.status = 201;
+    if (!name) {
+      ctx.status = 400;
+      ctx.body = { message: 'Field \'name\' does not setted' };
+    } else {
+      const newTicket = addTicket(name, description, status);
+      ctx.body = newTicket;
+      ctx.status = 201;
+    }
   } else {
     ctx.status = 404;
     ctx.body = { message: 'Not Found' };
