@@ -1,5 +1,7 @@
 # Домашнее задание к занятию "7. Работа с HTTP"
 
+![CI](https://github.com/unker/help-desk-server/actions/workflows/web.yml/badge.svg)
+
 Правила сдачи задания:
 
 1. **Важно**: в рамках этого ДЗ нужно использовать npm (а значит, никакого `yarn.lock` в репозитории быть не должно)

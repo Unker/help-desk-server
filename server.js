@@ -1,28 +1,21 @@
-const http = require('http');
 const Koa = require('koa');
 const koaBody = require('koa-body');
-const path = require('path');
-const uuid = require('uuid');
 const Router = require('koa-router');
 const cors = require('koa-cors');
+require('dotenv').config()
 
 const app = new Koa();
 const router = new Router();
 
-// app.use(koaBody({
-//   urlencoded: true,
-//   multipart: true,
-// }));
-
-app.use(cors({ 
+app.use(cors({
   origin: '*', // Настройка CORS для разрешения всех источников (*)
   methods: 'DELETE, PUT, PATCH, GET, POST'
-})); 
+}));
 
 const tickets = []; // Здесь будем хранить тикеты
 let globId = 0;
 
-function addTicket(name, description='', status=false) {
+function addTicket(name, description = '', status = false) {
   globId += 1;
   const newTicket = {
     id: globId,
@@ -65,7 +58,6 @@ router.post('/', koaBody({
 }), (ctx) => {
   const { method } = ctx.query;
   const { name, status, description } = ctx.request.body;
-  console.log(ctx.request.body)
   if (method === 'createTicket') {
     if (!name) {
       ctx.status = 400;
@@ -139,8 +131,8 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 // Добавление нескольких тикетов для тестирования
-addTicket(name='Заявка 1', description='Описание 1');
-addTicket(name='Заявка 2', description='Описание 2', status=true);
+addTicket(name = 'Заявка 1', description = 'Описание 1');
+addTicket(name = 'Заявка 2', description = 'Описание 2', status = true);
 
 const port = process.env.SERVER_PORT || 3000;
 app.listen(port, () => {
